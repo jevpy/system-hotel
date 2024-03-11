@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
+use App\Models\Gallary;
 use App\Models\Room;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,8 @@ class AdminController extends Controller
 
       if ($usertype == 'user') {
         $room = Room::all();
-        return view('home.index', compact('room'));
+        $gallary = Gallary::all();
+        return view('home.index', compact('room', 'gallary'));
       } else {
         return view('admin.index');
       }
@@ -109,9 +111,52 @@ class AdminController extends Controller
     $data = Booking::find($id);
     $data->delete();
     return redirect()->back();
+  }
+
+  public function approve_book($id)
+  {
+    $booking = Booking::find($id);
+    $booking->status = 'approve';
+    $booking->save();
+    return redirect()->back();
+
 
   }
 
+  public function reject_book($id)
+  {
+    $booking = Booking::find($id);
+    $booking->status = 'reject';
+    $booking->save();
+    return redirect()->back();
+
+  }
+
+  public function view_gallary()
+  {
+    $gallary = Gallary::all();
+    return view('admin.gallary', compact('gallary'));
+  }
+
+  public function upload_gallary(Request $request)
+  {
+    $data = new Gallary();
+    $image = $request->image;
+    if ($image) {
+      $imagename = time() . '.' . $image->getClientOriginalExtension();
+      $request->image->move('gallary', $imagename);
+      $data->image = $imagename;
+      $data->save();
+      return redirect()->back();
+    }
+  }
+
+  public function delete_gallary($id)
+  {
+    $data = Gallary::find();
+    $data->delete();
+    return redirect()->back();
+  }
 
 
 
